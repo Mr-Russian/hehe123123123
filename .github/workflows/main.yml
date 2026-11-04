@@ -1,0 +1,64 @@
+
+name: Build Neon Glass Music HUD
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: neon-glass-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Minecraft 26.3 Mod
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Detect project folder
+        id: project
+        shell: bash
+        run: |
+          if [ -f "build.gradle" ]; then
+            echo "dir=." >> "$GITHUB_OUTPUT"
+          elif [ -f "NeonGlassMusicHUD/build.gradle" ]; then
+            echo "dir=NeonGlassMusicHUD" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::Could not find build.gradle"
+            exit 1
+          fi
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: "9.6"
+          cache-provider: basic
+
+      - name: Build mod
+        run: gradle build --no-daemon
+        working-directory: ${{ steps.project.outputs.dir }}
+
+      - name: Upload Minecraft mod
+        uses: actions/upload-artifact@v6
+        with:
+          name: neon-glass-music-hud-minecraft-26.3
+          path: |
+            ${{ steps.project.outputs.dir }}/build/libs/*.jar
+            !${{ steps.project.outputs.dir }}/build/libs/*-sources.jar
+          if-no-files-found: error
+          retention-days: 14
