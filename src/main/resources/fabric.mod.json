@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "neonglass",
+  "version": "${version}",
+  "name": "Neon Glass Music HUD",
+  "description": "A neon glass Spotify player HUD and matching design studio for Minecraft Java 26.3.",
+  "authors": ["NeonGlass"],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": { "client": ["dev.neonglass.NeonGlassClient"] },
+  "depends": {
+    "fabricloader": ">=0.20.1",
+    "minecraft": "~26.3",
+    "java": ">=25",
+    "fabric-api": ">=0.165.2"
+  }
+}
